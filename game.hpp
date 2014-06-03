@@ -11,6 +11,7 @@
 #include <allegro5\allegro_font.h>
 #include <allegro5\allegro_ttf.h>
 //#include "enemy.hpp"
+#include "base.hpp"
 
 
 class game:public baseclass
@@ -24,6 +25,7 @@ class game:public baseclass
 	ALLEGRO_EVENT_QUEUE *event_queue;
 	ALLEGRO_TIMER *timer;
 	ALLEGRO_FONT *font;
+	ALLEGRO_EVENT ev;
 
 	//==============================================
 	//SHELL VARIABLES
@@ -52,6 +54,7 @@ class game:public baseclass
 	static const int SCREEN_HEIGHT = 480;
 	player* player1;
 	bool bound;
+	
 
 public:
 	game();

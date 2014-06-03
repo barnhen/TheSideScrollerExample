@@ -18,23 +18,6 @@ game::game()
 
 
 	//==============================================
-	//ALLEGRO INIT FUNCTIONS
-	//==============================================
-	if(!al_init())										//initialize Allegro
-		std::cout<<"Could not initialize allegro"<<std::endl;
-
-	//==============================================
-	//ADDON INSTALL
-	//==============================================
-	al_install_keyboard();
-	al_init_image_addon();
-	al_init_font_addon();
-	al_init_ttf_addon();
-	al_init_primitives_addon();
-	//al_install_audio();
-	//al_init_acodec_addon();
-
-	//==============================================
 	//SHELL VARIABLES
 	//==============================================
 	done = false;
@@ -48,11 +31,6 @@ game::game()
 
 
 
-	block = load_image("TileSet-1.bmp");
-	background=load_image("background.bmp");
-	bul = load_image("bullet.bmp");
-	ene = load_image("enemy.bmp");
-	font = al_load_font("arial.ttf", 20, 0);
 	baseclass::coord.x =  baseclass::coord.y = 0;
 	baseclass::coord.w = SCREEN_WIDTH;
 	baseclass::coord.h = SCREEN_HEIGHT;
@@ -60,8 +38,7 @@ game::game()
 	camera.w = SCREEN_WIDTH;
 	camera.h = SCREEN_HEIGHT;
 	direction[0] = direction[1] = 0; // setting initial x, and y coord.
-	running = true;
-	player1 = new player(load_image("player.bmp"));
+	//running = true;
 	bound = false;
 	//enemies.push_back(new enemy(ene, 100, 40, 1, 0));
 	finish.x = 0;
@@ -114,22 +91,16 @@ ALLEGRO_BITMAP* game::load_image(const char* filename)
 
 void game::handleEvents()
 {
-	srand(time(NULL));
-	//==============================================
-	//TIMER INIT AND STARTUP
-	//==============================================
-	event_queue = al_create_event_queue();
-	timer = al_create_timer(1.0 / 60);
 
-	al_register_event_source(event_queue, al_get_timer_event_source(timer));
-	al_register_event_source(event_queue, al_get_keyboard_event_source());
+	
+	//while(running)
+	//{
+	
+		al_register_event_source(event_queue, al_get_timer_event_source(timer));
+		al_register_event_source(event_queue, al_get_keyboard_event_source());
 
-	al_start_timer(timer);
-	gameTime = al_current_time();
+		al_start_timer(timer);
 
-	ALLEGRO_EVENT ev;
-	while(running)
-	{
 		al_wait_for_event(event_queue, &ev);
 		if(ev.type == ALLEGRO_EVENT_KEY_DOWN)
 		{
@@ -198,7 +169,7 @@ void game::handleEvents()
 					//bound = false;
 					break;
 			}
-			break;
+			//break;
 		}
 		//==============================================
 		//GAME UPDATE
@@ -219,7 +190,7 @@ void game::handleEvents()
 		}
 
 
-	}
+	//}
 
 }
 
@@ -308,7 +279,7 @@ void game::showmap()
 									};
 				//SDL_BlitSurface(block, &blockrect,screen,&destrect);
 				al_draw_bitmap_region(block, blockrect.x,blockrect.y,blockrect.w,blockrect.h,destrect.x, destrect.y,0);
-				al_flip_display();
+				//al_flip_display();
 
 			}
 		}
@@ -319,36 +290,51 @@ void game::showmap()
 
 void game::start()
 {
+	//==============================================
+	//ALLEGRO INIT FUNCTIONS
+	//==============================================
+	if(!al_init())										//initialize Allegro
+		std::cout<<"Could not initialize allegro"<<std::endl;
+
 	int start;
 	screen = al_create_display(SCREEN_WIDTH, SCREEN_HEIGHT);			//create our display object
 	if(!screen)										//test display object
 		std::cout<<"Could not create display"<<std::endl;
 
+	//==============================================
+	//ADDON INSTALL
+	//==============================================
+	al_install_keyboard();
+	al_init_image_addon();
+	al_init_font_addon();
+	al_init_ttf_addon();
+	al_init_primitives_addon();
+	//al_install_audio();
+	//al_init_acodec_addon();
+	//==============================================
+	//TIMER INIT AND STARTUP
+	//==============================================
+	event_queue = al_create_event_queue();
+	timer = al_create_timer(1.0 / 60);
+
+
+	block = load_image("TileSet-1.bmp");
+	background=load_image("background.bmp");
+	//bul = load_image("bullet.bmp");
+	//ene = load_image("enemy.bmp");
+	font = al_load_font("arial.ttf", 20, 0);
+	//player1 = new player(load_image("player.bmp"));
+
+
 	loadmap("map.map");
+	srand(time(NULL));
+	gameTime = al_current_time();
 
 	while(running)
 	{
 	//	start = SDL_GetTicks();
-		handleEvents();
 		render = true;
-
-		//==============================================
-		//RENDER
-		//==============================================
-		//if(render && al_is_event_queue_empty(event_queue))
-		//{
-			render = false;
-
-			al_draw_bitmap_region(background,camera.x,camera.y,camera.w,camera.h,0,0,0);
-			showmap();
-
-
-			//FLIP BUFFERS========================
-			al_flip_display();
-			//al_clear_to_color(al_map_rgb(0,0,0));
-
-		//}
-
+		handleEvents();
 	//	if (direction[0])
 	//	{
 	//		player1->setDirection('l');
@@ -550,5 +536,25 @@ void game::start()
 	//	{
 	//		SDL_Delay(1000/30-(SDL_GetTicks() - start));
 	//	}
+
+		//==============================================
+		//RENDER
+		//==============================================
+		if(render && al_is_event_queue_empty(event_queue))
+		{
+			render = false;
+
+			al_draw_bitmap_region(background,camera.x,camera.y,camera.w,camera.h,0,0,0);
+			showmap();
+			al_draw_textf(font, al_map_rgb(255, 255, 0), 5, 5, 0, "FPS: %i", gameFPS); // display game FPS on screen
+
+
+			//FLIP BUFFERS========================
+			al_flip_display();
+			al_clear_to_color(al_map_rgb(0,0,0));
+
+		}
+
+
 	}
 }
