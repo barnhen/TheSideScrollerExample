@@ -7,7 +7,7 @@ player::player(ALLEGRO_BITMAP* img)
 	box.x = 0;
 	box.y = 0;
 	box.w = 50;
-	box.h = 100;
+	box.h = 50;
 
 	xvel = 0;
 	yvel = 0;
@@ -88,8 +88,14 @@ void player::show(ALLEGRO_DISPLAY* screen)
 //	dw - destination width
 //	dh - destination height
 //	flags - same as foral_draw_bitmap
-al_draw_scaled_bitmap(image, box.x, box.y, box.w, box.h, 
-					  box.x, box.y, frame * 2, frame * 2,ALLEGRO_FLIP_HORIZONTAL);
+//al_draw_scaled_bitmap(image, box.x, box.y, box.w, box.h, 
+//					  box.x, box.y, box.w * 2, box.h * 2,ALLEGRO_FLIP_HORIZONTAL);
+
+//al_draw_scaled_bitmap(image, box.x, box.y, box.w, box.h, 
+					  //box.x, box.y, box.w * 2, box.h * 2,NULL);
+al_draw_bitmap(image, box.x, box.y,NULL);
+
+
 
 }
 

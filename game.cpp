@@ -11,6 +11,7 @@ game::game()
 	bul = NULL;
 	ene = NULL;
 
+
 	//==============================================
 	//ALLEGRO VARIABLES
 	//==============================================
@@ -27,9 +28,6 @@ game::game()
 	gameTime = 0;
 	frames = 0;
 	gameFPS = 0;
-
-
-
 
 	baseclass::coord.x =  baseclass::coord.y = 0;
 	baseclass::coord.w = SCREEN_WIDTH;
@@ -57,7 +55,7 @@ game::~game(void)
 	al_destroy_bitmap(background);
 	al_destroy_bitmap(bul);
 	al_destroy_event_queue(event_queue);
-	//delete player1 ;
+	delete player1 ;
 	//for (int i = 0; i < bullets.size(); i++)
 	//{
 	//	delete bullets[i];
@@ -111,14 +109,14 @@ void game::handleEvents()
 				//	return;
 				case ALLEGRO_KEY_LEFT:
 					direction[0]=1;
-					//player1->setMoving(true);
+					player1->setMoving(true);
 					break;
 				case ALLEGRO_KEY_RIGHT:
 					direction[1]=1;
-					//player1->setMoving(true);
+					player1->setMoving(true);
 					break;
 				case ALLEGRO_KEY_SPACE:
-					//player1->setJump();
+					player1->setJump();
 					break;
 				case ALLEGRO_KEY_BACKSPACE:
 					running = false;
@@ -156,11 +154,11 @@ void game::handleEvents()
 			{
 				case ALLEGRO_KEY_LEFT:
 					direction[0]=0;
-					//player1->setMoving(false);
+					player1->setMoving(false);
 					break;
 				case ALLEGRO_KEY_RIGHT:
 					direction[1]=0;
-					//player1->setMoving(false);
+					player1->setMoving(false);
 					break;
 				case ALLEGRO_KEY_BACKSPACE:
 					running = false;
@@ -317,13 +315,14 @@ void game::start()
 	event_queue = al_create_event_queue();
 	timer = al_create_timer(1.0 / 60);
 
+	imgPlayer = al_load_bitmap("player.fw.png");
+	player1 = new player(imgPlayer);
 
 	block = load_image("TileSet-1.bmp");
 	background=load_image("background.bmp");
 	//bul = load_image("bullet.bmp");
 	//ene = load_image("enemy.bmp");
 	font = al_load_font("arial.ttf", 20, 0);
-	//player1 = new player(load_image("player.bmp"));
 
 
 	loadmap("map.map");
@@ -333,75 +332,76 @@ void game::start()
 	while(running)
 	{
 	//	start = SDL_GetTicks();
+		start = (int)timer;
 		render = true;
 		handleEvents();
-	//	if (direction[0])
-	//	{
-	//		player1->setDirection('l');
-	//		if(player1->getRect()->x > 0)
-	//		{
-	//			player1 -> setXvel(-1);
-	//		}
-	//		else
-	//		{
-	//			player1->setXvel(0);
-	//			camera.x--;
-	//			baseclass::coord.x--;
-	//		}
-	//		if (camera.x < 0)
-	//		{
-	//			camera.x = 2000 - SCREEN_WIDTH;
-	//		}
-	//	}
+		if (direction[0])
+		{
+			player1->setDirection('l');
+			if(player1->getRect()->x > 0)
+			{
+				player1 -> setXvel(-1);
+			}
+			else
+			{
+				player1->setXvel(0);
+				camera.x--;
+				baseclass::coord.x--;
+			}
+			if (camera.x < 0)
+			{
+				camera.x = 2000 - SCREEN_WIDTH;
+			}
+		}
 
-	//	else if (direction[1])
-	//	{
-	//		player1->setDirection('r');
-	//		if (player1->getRect()->x < 80) // so the player cannot movrt far left on the border left
-	//		{
-	//			player1->setXvel(1);
-	//		}
-	//		else
-	//		{
-	//			player1->setXvel(0);
-	//			camera.x++;
-	//			baseclass::coord.x++;
-	//		}
-	//		if (camera.x >= 2000 - SCREEN_WIDTH)
-	//		{
-	//			camera.x = 0;
-	//		}
-	//	}
-	//	// if does not press any key
-	//	else
-	//	{
-	//		player1->setXvel(0);
-	//	}
+		else if (direction[1])
+		{
+			player1->setDirection('r');
+			if (player1->getRect()->x < 80) // so the player cannot movrt far left on the border left
+			{
+				player1->setXvel(1);
+			}
+			else
+			{
+				player1->setXvel(0);
+				camera.x++;
+				baseclass::coord.x++;
+			}
+			if (camera.x >= 2000 - SCREEN_WIDTH)
+			{
+				camera.x = 0;
+			}
+		}
+		// if does not press any key
+		else
+		{
+			player1->setXvel(0);
+		}
 
 	//			//collision detection begin
-	//	int str = ( baseclass::coord.x - (baseclass::coord.x % baseclass::TILE_SIZE)) / baseclass::TILE_SIZE;
-	//	int end = (baseclass::coord.x + baseclass::coord.w + (baseclass::TILE_SIZE - (baseclass::coord.x + baseclass::coord.w) % baseclass::TILE_SIZE)) / TILE_SIZE;
-	//
-	//	if (start < 0)
-	//	{
-	//		start=0;
-	//	}
-	//	if (end > map[0].size())
-	//	{
-	//		end = map[0].size();
-	//	}
-	//	std::cout<<"map[0].size() is "<<map[0].size()<<std::endl;
-	//	std::cout<<"end is "<<end<<std::endl;
-	//	bool nc = false; // non collision
+		int str = ( baseclass::coord.x - (baseclass::coord.x % baseclass::TILE_SIZE)) / baseclass::TILE_SIZE;
+		int end = (baseclass::coord.x + baseclass::coord.w + (baseclass::TILE_SIZE - (baseclass::coord.x + baseclass::coord.w) % baseclass::TILE_SIZE)) / TILE_SIZE;
+	
+		if (start < 0)
+		{
+			start=0;
+		}
+		if (end > map[0].size())
+		{
+			end = map[0].size();
+		}
+		std::cout<<"map[0].size() is "<<map[0].size()<<std::endl;
+		std::cout<<"end is "<<end<<std::endl;
+		bool nc = false; // non collision
 
-	//	for (int i = 0; i < map.size(); i++)
-	//	{
-	//		for (int j = str; j < map      .size(); j++)
-	//		{
-	//			//std::cout<<"j is "<<j<<std::endl;
-	//			if(map[i][j] == 0)
-	//				continue;
-	//			al_rect destrect =  { j * 50 - baseclass::coord.x,i * 50, 50, 50 };
+		for (int i = 0; i < map.size(); i++)
+		{
+			for (int j = str; j < map      .size(); j++)
+			{
+				//std::cout<<"j is "<<j<<std::endl;
+				if(map[i][j] == 0)
+					continue;
+				al_rect destrect =  { j * 50 - baseclass::coord.x,i * 50, 50, 50 };
 	//			//for (int g = 0; g < bullets.size(); g++)
 	//			//{
 	//			//	if (collision(bullets[g]->getRect(), &destrect))
@@ -410,9 +410,9 @@ void game::start()
 	//			//		bullets.erase(bullets.begin() + g);
 	//			//	}
 
-	//			//}
-	//		}
-	//	}
+				//}
+			}
+		}
 
 
 
@@ -481,7 +481,7 @@ void game::start()
 
 		
 
-		//player1->move(map);
+		player1->move(map);
 
 		//for (int i = 0; i < bullets.size(); i++)
 		//{
@@ -546,6 +546,7 @@ void game::start()
 
 			al_draw_bitmap_region(background,camera.x,camera.y,camera.w,camera.h,0,0,0);
 			showmap();
+			player1->show(screen);
 			al_draw_textf(font, al_map_rgb(255, 255, 0), 5, 5, 0, "FPS: %i", gameFPS); // display game FPS on screen
 
 

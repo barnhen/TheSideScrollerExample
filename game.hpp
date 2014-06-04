@@ -21,11 +21,15 @@ class game:public baseclass
 	//==============================================
 	ALLEGRO_DISPLAY *screen;
 	//const int FPS = 60;
-	ALLEGRO_BITMAP*  background, *block, *bul, *ene;	
+	ALLEGRO_BITMAP*  background, *block, *bul, *ene, *imgPlayer;	
 	ALLEGRO_EVENT_QUEUE *event_queue;
 	ALLEGRO_TIMER *timer;
 	ALLEGRO_FONT *font;
 	ALLEGRO_EVENT ev;
+
+
+	player* player1;
+
 
 	//==============================================
 	//SHELL VARIABLES
@@ -52,7 +56,7 @@ class game:public baseclass
 	bool running;
 	static const int SCREEN_WIDTH = 640;
 	static const int SCREEN_HEIGHT = 480;
-	player* player1;
+	//player* player1;
 	bool bound;
 	
 
