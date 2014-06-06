@@ -9,6 +9,15 @@ class baseclass
 {
 protected:
 	bool collision(al_rect* rec1, al_rect* rec2);
+	int curFrame;
+	float frameWidth;
+	float frameHeight;
+	int animationRow;
+	int frameCount;
+	int frameDelay;
+	int maxFrame;
+
+
 public:
 	static al_rect coord;//coord variable, store the absolute coordinate of the screen, so if I go a 1000px it will be a 1000px
     //actual memory will be reserved in the game.cpp

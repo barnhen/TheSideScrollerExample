@@ -16,6 +16,12 @@ class player:baseclass
 	double frame;
 	bool moving;
 	int health;
+	int fx;
+	int fy;
+	bool flipped;
+
+
+
 public:
 	player(ALLEGRO_BITMAP* img);
 	~player(void);

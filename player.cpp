@@ -1,4 +1,5 @@
 #include "player.hpp"
+//#include <allegro5\allegro_primitives.h>
 
 
 player::player(ALLEGRO_BITMAP* img)
@@ -11,6 +12,8 @@ player::player(ALLEGRO_BITMAP* img)
 
 	xvel = 0;
 	yvel = 0;
+
+	flipped = false;
 
 	//4 is the clips size
 	//for (int i = 0; i < 4; i++)
@@ -25,6 +28,17 @@ player::player(ALLEGRO_BITMAP* img)
 	frame = 0.0;
 	moving = false;
 	health = 10;
+		curFrame = 0;
+
+	frameWidth = 50; //old 31.6
+	frameHeight = 50; //old 32
+	maxFrame = 2; // old 3
+	animationRow = 1;
+	frameCount = 0;
+	frameDelay = 19;
+	//al_init_primitives_addon();
+
+
 }
 
 void player::setJump()
@@ -75,25 +89,79 @@ void player::setXvel(int vel)
 
 void player::show(ALLEGRO_DISPLAY* screen)
 {
+	//char dx;
+	//if(box.y < 0)
+	//	box.y = 0;
+	//else if(box.y > Height)
+	//	box.y = HEIGHT;
+	if (!moving)
+	{
+		//curFrame = 0;
+		//xvel = 0;
+		//yvel = 0;
+	}
+	else
+	{
+			std::cout<<"frameCount->"<<frameCount<<std::endl;
+			std::cout<<"frameDelay->"<<frameDelay<<std::endl;
+		if(++frameCount >= frameDelay){
+			//std::cout<<"frameCount->"<<frameCount<<std::endl;
+			//std::cout<<"frameDelay->"<<frameDelay<<std::endl;
+			if(++curFrame >= maxFrame){
+				curFrame = 0;
+
+			}
+			frameCount=0;
+		}
+	}
+
 	// since there is no specific round function in cpp and cast in integer does round a value below and add 0.5 to round the upper value so everything above 0.5 will be 1 and everything below 0.5 will be zero.
 	//SDL_BlitSurface(image, &clips[(int) (frame + 0.5)], screen, &box);
+	std::cout<<"curFrame is "<<curFrame<<std::endl;
+	std::cout<<"animationRow is "<<animationRow<<std::endl;
+	fx = (curFrame) * (int)frameWidth;
+	fy = animationRow * (int)frameHeight;
 
-//Draws a scaled version of the given bitmap to the target bitmap.
-//	sx - source x
-//	sy - source y
-//	sw - source width
-//	sh - source height
-//	dx - destination x
-//	dy - destination y
-//	dw - destination width
-//	dh - destination height
-//	flags - same as foral_draw_bitmap
-//al_draw_scaled_bitmap(image, box.x, box.y, box.w, box.h, 
-//					  box.x, box.y, box.w * 2, box.h * 2,ALLEGRO_FLIP_HORIZONTAL);
+	//dx = getDirection();
+	if (!flipped)
+	{
+		//Draws a scaled version of the given bitmap to the target bitmap.
+		//	sx - source x
+		//	sy - source y
+		//	sw - source width
+		//	sh - source height
+		//	dx - destination x
+		//	dy - destination y
+		//	dw - destination width
+		//	dh - destination height
+		//	flags - same as foral_draw_bitmap
+		//al_draw_scaled_bitmap(image, baseclass::coord.x, baseclass::coord.y, box.w, box.h, 
+		//					  box.x, box.y, box.w * 2, box.h * 2,0);
 
-//al_draw_scaled_bitmap(image, box.x, box.y, box.w, box.h, 
-					  //box.x, box.y, box.w * 2, box.h * 2,NULL);
-al_draw_bitmap(image, box.x, box.y,NULL);
+		//al_draw_scaled_bitmap(image, box.x, box.y, box.w, box.h, 
+							  //box.x, box.y, box.w * 2, box.h * 2,NULL);
+		//al_draw_bitmap(image, box.x, box.y,NULL);
+			al_draw_bitmap_region(image, fx, baseclass::coord.y, frameWidth, frameHeight,
+				box.x, box.y, 0);	
+		//al_draw_bitmap(image, fx, fy,NULL);
+
+
+	}//if (direction = 'r')
+	else if (flipped)
+	{
+		//Draws a scaled version of the given bitmap to the target bitmap.
+		//	sx - source x
+		//	sy - source y
+		//	sw - source width
+		//	sh - source height
+		//	dx - destination x
+		//	dy - destination y
+		//	dw - destination width
+		//	dh - destination height
+		//	flags - same as foral_draw_bitmap
+		al_draw_bitmap_region(image, fx, baseclass::coord.y, frameWidth, frameHeight,
+			box.x, box.y, ALLEGRO_FLIP_HORIZONTAL);		
+	}
 
 
 
@@ -111,11 +179,13 @@ void player::setDirection(char c)
 		direction = c;
 		if (direction == 'r')
 		{
-			frame = 0.0;
+			//frame = 0.0;
+			flipped = false;
 		}
 		else
 		{
-			frame = 1.6;
+			//frame = 1.6;
+			flipped = true;
 		}
 	}
 }
@@ -142,6 +212,7 @@ void player::move(const std::vector<std::vector<int> >& map)
 			if(map[i][j] == 0)
 				continue;
 			al_rect destrect =  { j * 50 - baseclass::coord.x,i * 50, 50, 50 };
+			
 			if (collision(&box, &destrect))
 			{
 				nc = true;
@@ -187,9 +258,10 @@ void player::move(const std::vector<std::vector<int> >& map)
 	
 	box.x += xvel;
 	box.y += yvel;
-	//if (moving)
-	//{
-	//	frame+=0.2;
+	if (moving)
+	{
+		//curFrame+=1;
+		//curFrame++;
 
 	//	// workaround to loop in the spritesheet begin
 	//	if (direction == 'r' && frame >= 1.4)
@@ -201,7 +273,11 @@ void player::move(const std::vector<std::vector<int> >& map)
 	//		frame = 1.5; // starts on the flipped side of player sprite
 	//	}
 	//	// workaround to loop in the spritesheet end
-	//}
+	}
+	else
+	{
+		curFrame=0;
+	}
 	
 }
 

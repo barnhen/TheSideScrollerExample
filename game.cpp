@@ -29,6 +29,8 @@ game::game()
 	frames = 0;
 	gameFPS = 0;
 
+	frameDelay = 4;
+
 	baseclass::coord.x =  baseclass::coord.y = 0;
 	baseclass::coord.w = SCREEN_WIDTH;
 	baseclass::coord.h = SCREEN_HEIGHT;
@@ -145,6 +147,9 @@ void game::handleEvents()
 						running = false;
 					//}
 					break;
+				//default:
+				//	player1->setMoving(false);
+				//	break;
 			}
 		}
 
@@ -166,6 +171,10 @@ void game::handleEvents()
 				case ALLEGRO_KEY_C:
 					//bound = false;
 					break;
+				//default:
+				//	player1->setMoving(false);
+				//	break;
+
 			}
 			//break;
 		}
@@ -184,10 +193,22 @@ void game::handleEvents()
 				gameFPS = frames;
 				frames = 0;
 			}
+
+		//if(++frameCount >= frameDelay){
+		//if(++curFrame >= maxFrame){
+		//	curFrame = 0;
+
+		//}
+		//frameCount=0;
 	
-		}
+		//}
 
 
+	}
+	//else
+	//{
+	//	player1->setMoving(false);
+	//	
 	//}
 
 }
