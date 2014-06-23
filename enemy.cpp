@@ -1,5 +1,7 @@
 #include "enemy.hpp"
-
+#include <iostream>
+#include <allegro5\allegro_font.h>
+#include <allegro5\allegro_ttf.h>
 
 enemy::enemy(ALLEGRO_BITMAP* img, int x, int y, int xVel, int yVel)
 {
@@ -10,6 +12,10 @@ enemy::enemy(ALLEGRO_BITMAP* img, int x, int y, int xVel, int yVel)
 	box.h = al_get_bitmap_height(image);
 	xvel = xVel;
 	yvel = yVel;
+	maxFrame = 2; // old 3
+	animationRow = 1;
+	frameCount = 0;
+	frameDelay = 19;
 	ground = false;
 	for (int i = 0; i < 2; i++)
 	{
@@ -18,13 +24,44 @@ enemy::enemy(ALLEGRO_BITMAP* img, int x, int y, int xVel, int yVel)
 		clips[i].w = clips[i].h = 50; // 50 is the enemy height frame
 	}
 	frame = 0.0;
-	
+	curFrame = 1;
+	frameWidth = 50; //old 31.6
+	frameHeight = 50; //old 32
+
 }
 
 void enemy::show(ALLEGRO_DISPLAY* screen)
 {
+	std::cout<<"frameCount->"<<frameCount<<std::endl;
+	std::cout<<"frameDelay->"<<frameDelay<<std::endl;
+	if(++frameCount >= frameDelay){
+		//std::cout<<"frameCount->"<<frameCount<<std::endl;
+		//std::cout<<"frameDelay->"<<frameDelay<<std::endl;
+		if(++curFrame >= maxFrame){
+			curFrame = 0;
+
+		}
+		frameCount=0;
+	}
 	al_rect tmp = {box.x -coord.x,box.y,50, 50}; // must do this way to be relative coordinate	
+	int fx = (curFrame) * (int)frameWidth;
+	int fy = animationRow * (int)frameHeight;
+
 	//SDL_BlitSurface(image, &clips[(int) (frame + 0.5) ], screen, &tmp);
+	//al_draw_bitmap_region(image, tmp.x,tmp.y,tmp.w,tmp.h, fx, fy,0);
+	ALLEGRO_FONT *theFont= al_load_font("arial.ttf", 12, 0);
+	al_draw_textf(theFont, al_map_rgb(255, 255, 0), 5, 65, 0, "enemy FX: %i", fx);
+	al_draw_textf(theFont, al_map_rgb(255, 255, 0), 85, 65, 0, "enemy FY: %i", fy);
+	al_draw_textf(theFont, al_map_rgb(255, 255, 0), 165, 65, 0, "enemy box.x: %i", box.x);
+	al_draw_textf(theFont, al_map_rgb(255, 255, 0), 265, 65, 0, "enemy box.y: %i", box.y);
+	al_draw_textf(theFont, al_map_rgb(255, 255, 0), 365, 65, 0, "enemy tmp.w: %i", tmp.w);
+	al_draw_textf(theFont, al_map_rgb(255, 255, 0), 465, 65, 0, "enemy tmp.h: %i", tmp.h);
+
+
+
+
+	al_draw_bitmap_region(image, fx, coord.y, tmp.w,tmp.h,enemy::box.x,enemy::box.y, 0);
+
 }
 
 

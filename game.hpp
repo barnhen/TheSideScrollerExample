@@ -10,7 +10,7 @@
 #include <vector>
 #include <allegro5\allegro_font.h>
 #include <allegro5\allegro_ttf.h>
-//#include "enemy.hpp"
+#include "enemy.hpp"
 #include "base.hpp"
 
 
@@ -45,7 +45,7 @@ class game:public baseclass
 	al_rect camera;
 	std::vector<std::vector<int> > map;
 	//std::vector<bullet*> bullets;
-	//std::vector<enemy*> enemies;
+	std::vector<enemy*> enemies;
 
 	bool direction[2]; // for x and y coordinates
 	al_rect finish;
@@ -64,7 +64,10 @@ public:
 	game();
 	~game();
 	void start();
+	int GetGameFPS(void);
 	//int showmenu(ALLEGRO_DISPLAY* screen); //shows he menu
 	//void showMessage(const char* c);
+	void ShowDebugMode(void);
+
 };
 

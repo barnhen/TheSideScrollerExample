@@ -1,4 +1,5 @@
 #include "game.hpp"
+#include "Misc.hpp"
 
 al_rect baseclass::coord; //we have to actually reserve memory for the static SDL_Rect from the baseclass
 
@@ -62,10 +63,10 @@ game::~game(void)
 	//{
 	//	delete bullets[i];
 	//}
-	//for (int i = 0; i < enemies.size(); i++)
-	//{
-	//	delete enemies[i];
-	//}
+	for (int i = 0; i < enemies.size(); i++)
+	{
+		delete enemies[i];
+	}
 	al_destroy_font(font);
 	//TTF_Quit();
 	//SDL_Quit();
@@ -213,6 +214,25 @@ void game::handleEvents()
 
 }
 
+void game::ShowDebugMode(void)
+{
+	//al_init_font_addon();
+	//al_init_ttf_addon();
+	ALLEGRO_FONT *smallFont;
+	smallFont = al_load_font("arial.ttf", 12,0);
+	al_draw_textf(font, al_map_rgb(255, 255, 0), 5, 5, 0, "FPS: %i", gameFPS); // display game FPS on screen
+	al_draw_textf(smallFont, al_map_rgb(255, 255, 0), 5, 25, 0, "player x vel: %i", player1->getXvel()); // display game FPS on screen
+	al_destroy_font(smallFont);
+
+
+}
+
+int game::GetGameFPS(void)
+{
+	//const int fps = gameFPS;
+	return gameFPS;
+}
+
 void game::loadmap(const char* filename)
 {
 	std::ifstream in (filename);
@@ -237,27 +257,29 @@ void game::loadmap(const char* filename)
 			}
 			
 			in >> current;
-		//	if (current == -1)
-		//	{
-		//		enemies.push_back(new enemy(ene, j* 50, i * 50, 1, 0));
-				//vec.push_back(0);
-		//	}
-		//	else
-		//	{
-		//		if (current>=0 && current <=7)
-		//		{
+			if (current == -1)
+			{
+				enemies.push_back(new enemy(ene, j* 50, i * 50, 1, 0));
+				vec.push_back(0);
+			}
+			else
+			{
+			//of all elements 1 to 7 tiles types we add every single one detected
+				if (current>=0 && current <=7)
+				{
 		//			if (current == 3)
 		//			{
 		//				finish.x = j * 50;
 		//				finish.y = i * 50;
 		//			}
 					vec.push_back(current);
-		//		}			
-		//		else
-		//		{
-					//vec.push_back(0);
-		//		}
-			//}
+				}
+				//or we add the enemy
+				else
+				{
+					vec.push_back(0);
+				}
+			}
 		}
 		map.push_back(vec);
 	}
@@ -268,8 +290,8 @@ void game::loadmap(const char* filename)
 
 void game::showmap()
 {
-	int start = ( baseclass::coord.x - (baseclass::coord.x % baseclass::TILE_SIZE)) / baseclass::TILE_SIZE;
-	int end = (baseclass::coord.x + baseclass::coord.w + (baseclass::TILE_SIZE - (baseclass::coord.x + baseclass::coord.w) % baseclass::TILE_SIZE)) / 50;
+	int start = ( game::coord.x - (game::coord.x % game::TILE_SIZE)) / game::TILE_SIZE;
+	int end = (game::coord.x + game::coord.w + (game::TILE_SIZE - (game::coord.x + game::coord.w) % game::TILE_SIZE)) / 50;
 	
 	if (start < 0)
 	{
@@ -289,12 +311,12 @@ void game::showmap()
 				//we calculate the position in the TileSet-1.bmp image
 				al_rect blockrect = {
 										//because coord of tileset begins with 0 and not 1 I have to do (tilesize * tilenumber) minus 1
-										(map[i][j]-1) * baseclass::TILE_SIZE,0,baseclass::TILE_SIZE,baseclass::TILE_SIZE
+										(map[i][j]-1) * game::TILE_SIZE,0,game::TILE_SIZE,game::TILE_SIZE
 									 };
 
 				//destrect = destination rectangle and in the screen (so for example if the camera at 100px position and the tile is at 120px position, we show the tile at 20px position
 				al_rect destrect = {
-										j * baseclass::TILE_SIZE-baseclass::coord.x, i*50
+										j * game::TILE_SIZE-game::coord.x, i*50
 									};
 				//SDL_BlitSurface(block, &blockrect,screen,&destrect);
 				al_draw_bitmap_region(block, blockrect.x,blockrect.y,blockrect.w,blockrect.h,destrect.x, destrect.y,0);
@@ -309,6 +331,7 @@ void game::showmap()
 
 void game::start()
 {
+	bool isDebugMode = true;
 	//==============================================
 	//ALLEGRO INIT FUNCTIONS
 	//==============================================
@@ -342,7 +365,7 @@ void game::start()
 	block = load_image("TileSet-1.bmp");
 	background=load_image("background.bmp");
 	//bul = load_image("bullet.bmp");
-	//ene = load_image("enemy.bmp");
+	ene = load_image("enemy.bmp");
 	font = al_load_font("arial.ttf", 20, 0);
 
 
@@ -417,7 +440,7 @@ void game::start()
 
 		for (int i = 0; i < map.size(); i++)
 		{
-			for (int j = str; j < map      .size(); j++)
+			for (int j = str; j < map.size(); j++)
 			{
 				//std::cout<<"j is "<<j<<std::endl;
 				if(map[i][j] == 0)
@@ -509,10 +532,10 @@ void game::start()
 		//	bullets[i]->move();
 		//}
 
-		//for (int i = 0; i < enemies.size(); i++)
-		//{
-		//	enemies[i]->move(map);
-		//}
+		for (int i = 0; i < enemies.size(); i++)
+		{
+			enemies[i]->move(map);
+		}
 
 
 		//SDL_BlitSurface(background,&camera,screen,NULL);
@@ -568,8 +591,20 @@ void game::start()
 			al_draw_bitmap_region(background,camera.x,camera.y,camera.w,camera.h,0,0,0);
 			showmap();
 			player1->show(screen);
-			al_draw_textf(font, al_map_rgb(255, 255, 0), 5, 5, 0, "FPS: %i", gameFPS); // display game FPS on screen
+			for (int i = 0; i < enemies.size(); i++)
+			{
+				enemies[i]->show(screen);
+			}
 
+
+
+			if (isDebugMode)
+			{
+				//Misc misc;
+				ShowDebugMode();
+				//al_draw_textf(font, al_map_rgb(255, 255, 0), 5, 5, 0, "FPS: %i", gameFPS); // display game FPS on screen
+				//al_draw_textf(font, al_map_rgb(255, 255, 0), 5, 5, 0, "FPS: %i", GetGameFPS()); // display game FPS on screen
+			}
 
 			//FLIP BUFFERS========================
 			al_flip_display();
